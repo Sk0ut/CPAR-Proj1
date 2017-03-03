@@ -1,45 +1,70 @@
-//#include <omp.h>
+#include <omp.h>
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
 #include <time.h>
 #include <cstdlib>
 #include <papi.h>
+#include <string.h>
 
 using namespace std;
 
 #define SYSTEMTIME clock_t
+#define BLU   "\x1B[34m"
+#define RESET "\x1B[0m"
+#define OMP 1
 
- 
-void OnMult(int m_ar, int m_br) 
-{	
-	SYSTEMTIME Time1, Time2;
-	
-	char st[100];
-	double temp;
-	int i, j, k;
 
-	double *pha, *phb, *phc;
-	
+void initMatrices(int m_ar, int m_br, double **pha, double **phb, double **phc) 
+{
+	int i, j;
 
-		
-    pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
-	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
-	phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	*pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	*phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	*phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
 
 	for(i=0; i<m_ar; i++)
 		for(j=0; j<m_ar; j++)
-			pha[i*m_ar + j] = (double)1.0;
-
+			(*pha)[i*m_ar + j] = (double)1.0;
 
 
 	for(i=0; i<m_br; i++)
 		for(j=0; j<m_br; j++)
-			phb[i*m_br + j] = (double)(i+1);
+			(*phb)[i*m_br + j] = (double)(i+1);
+}
 
+void freeMatrices(double **pha, double **phb, double **phc)
+{
+	free(*pha);
+	free(*phb);
+	free(*phc);
+}
 
+void printMatrixResult(int m_br, double **phc)
+{
+	int i, j; 
+	
+	cout << "Result matrix: " << endl;
+	for(i=0; i<1; i++)
+	{	for(j=0; j<min(10,m_br); j++)
+			cout << (*phc)[j] << " ";
+	}
+	cout << endl;
+}
+ 
+void OnMult(int m_ar, int m_br) 
+{	
+	SYSTEMTIME Time1, Time2;
+		
+	double temp;
+	char st[100];
+	int i, j, k;
 
-    Time1 = clock();
+	double *pha, *phb, *phc;
+	
+	initMatrices(m_ar, m_br, &pha, &phb, &phc);
+	
+    	Time1 = clock();
 
 	for(i=0; i<m_ar; i++)
 	{	for( j=0; j<m_br; j++)
@@ -52,52 +77,28 @@ void OnMult(int m_ar, int m_br)
 		}
 	}
 
-
-    Time2 = clock();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
+	Time2 = clock();
+	
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);	
 	cout << st;
-
-	cout << "Result matrix: " << endl;
-	for(i=0; i<1; i++)
-	{	for(j=0; j<min(10,m_br); j++)
-			cout << phc[j] << " ";
-	}
-	cout << endl;
-
-    free(pha);
-    free(phb);
-    free(phc);	
+	
+	printMatrixResult(m_br, &phc);
+	freeMatrices(&pha, &phb, &phc);
 }
 
 
 void OnMultLine(int m_ar, int m_br)
 {
-    SYSTEMTIME Time1, Time2;
+    	SYSTEMTIME Time1, Time2;
 	
 	char st[100];
-	double temp;
 	int i, j, k;
 
 	double *pha, *phb, *phc;
 	
-
-		
-    	pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
-	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
-	phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
-
-	for(i=0; i<m_ar; i++)
-		for(j=0; j<m_ar; j++)
-			pha[i*m_ar + j] = (double)1.0;
-
-
-
-	for(i=0; i<m_br; i++)
-		for(j=0; j<m_br; j++)
-			phb[i*m_br + j] = (double)(i+1);
-
+    	initMatrices(m_ar, m_br, &pha, &phb, &phc);
 	
-    Time1 = clock();
+    	Time1 = clock();
 
 	for(i=0; i < m_ar; ++i)
 		for(j = 0; j < m_br; ++j)
@@ -113,22 +114,52 @@ void OnMultLine(int m_ar, int m_br)
 			}
 		}
 	}
-
 	
-    Time2 = clock();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
+    	Time2 = clock();
+
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);	
 	cout << st;
+	
+	printMatrixResult(m_br, &phc);
+	freeMatrices(&pha, &phb, &phc);
+}
 
-	cout << "Result matrix: " << endl;
-	for(i=0; i<1; i++)
-	{	for(j=0; j<min(10,m_br); j++)
-			cout << phc[j] << " ";
+void OnMultLineParallel(int m_ar, int m_br, int nThreads)
+{
+    	double Time1, Time2;
+	
+	char st[100];
+	int i, j, k;
+
+	double *pha, *phb, *phc;
+			
+    	initMatrices(m_ar, m_br, &pha, &phb, &phc);
+	
+	//omp_set_num_threads(nThreads);
+
+	Time1 = omp_get_wtime();
+
+	memset(phc, 0, (m_ar * m_ar) * sizeof(double));
+
+	#pragma omp parallel for num_threads(nThreads)
+	for(i=0; i<m_ar; i++)
+	{	
+		for( j=0; j<m_ar; j++) 
+		{
+			for( k=0; k<m_br; k++)
+			{	
+				phc[i*m_ar+k] += pha[i*m_ar+k] * phb[j*m_br+k];
+			}
+		}
 	}
-	cout << endl;
+	
+	Time2 = omp_get_wtime();
 
-    free(pha);
-    free(phb);
-    free(phc);	
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));	
+	cout << st;
+	
+	printMatrixResult(m_br, &phc);
+	freeMatrices(&pha, &phb, &phc);	
 }
 
 
@@ -176,6 +207,10 @@ int main (int argc, char *argv[])
   	int ret;
 	
 
+	cout << "CPU(s) available(s): " BLU << omp_get_num_procs() << RESET << endl;
+	cout << "Thread(s) available(s): " BLU << omp_get_max_threads() << RESET << endl;
+
+
 	ret = PAPI_library_init( PAPI_VER_CURRENT );
 	if ( ret != PAPI_VER_CURRENT )
 		std::cout << "FAIL" << endl;
@@ -197,6 +232,7 @@ int main (int argc, char *argv[])
 	do {
 		cout << endl << "1. Multiplication" << endl;
 		cout << "2. Line Multiplication" << endl;
+		cout << "3. Parallel Line Multiplication" << endl;
 		cout << "Selection?: ";
 		cin >>op;
 		if (op == 0)
@@ -215,8 +251,10 @@ int main (int argc, char *argv[])
 				OnMult(lin, col);
 				break;
 			case 2:
-				OnMultLine(lin, col);
-    
+				OnMultLine(lin, col);    
+				break;
+			case 3:
+				OnMultLineParallel(lin, col, omp_get_max_threads());     //mudar
 				break;
 		}
 
