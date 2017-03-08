@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,8 +53,42 @@ namespace CPAR
 
         static void OnMultLine(int m_ar, int m_br)
         {
+            int i, j, k;
 
+            double[] pha = new double[m_ar * m_ar], phb = new double[m_ar * m_ar], phc = new double[m_ar * m_ar];
 
+            for (i = 0; i < m_ar; i++)
+                for (j = 0; j < m_ar; j++)
+                    pha[i * m_ar + j] = (double)1.0;
+
+            for (i = 0; i < m_br; i++)
+                for (j = 0; j < m_br; j++)
+                    phb[i * m_br + j] = (double)(i + 1);
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            for (i = 0; i < m_ar; i++)
+            {
+                for (j = 0; j < m_ar; j++)
+                {
+                    for (k = 0; k < m_br; k++)
+                    {
+                        phc[i * m_ar + k] += pha[i * m_ar + k] * phb[j * m_br + k];
+                    }
+                }
+            }
+
+            watch.Stop();
+
+            Console.WriteLine("Time: " + watch.ElapsedMilliseconds / 1000.0 + " seconds\n");
+            Console.WriteLine("Result matrix: ");
+
+            for (i = 0; i < 1; i++)
+            {
+                for (j = 0; j < Math.Min(10, m_br); j++)
+                    Console.WriteLine(phc[j] + " ");
+            }
+            Console.WriteLine();
         }
 
 
