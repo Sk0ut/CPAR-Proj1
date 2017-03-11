@@ -82,7 +82,7 @@ void OnMultLine(int m_ar, int m_br)
 		{
 			for( k=0; k<m_br; k++)
 			{	
-				phc[i*m_ar+k] += pha[i*m_ar+k] * phb[j*m_br+k];
+				phc[i*m_ar+k] += pha[i*m_ar+j] * phb[j*m_br+k];
 			}
 		}
 	}
@@ -152,7 +152,7 @@ void OnMultLineParallel(int m_ar, int m_br, int nThreads)
 		{
 			for( k=0; k<m_br; k++)
 			{	
-				phc[i*m_ar+k] += pha[i*m_ar+k] * phb[j*m_br+k];
+				phc[i*m_ar+k] += pha[i*m_ar+j] * phb[j*m_br+k];
 			}
 		}
 	}
