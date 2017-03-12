@@ -25,7 +25,9 @@ void papi_InitEvents(int &EventSet);
 
 void papi_StartCount(int &EventSet);
 
-void papi_StopCount(int &EventSet); 
+void papi_StopCount(int &EventSet, long long &l1DCM, long long &l2DCM);
+
+void papi_PrintCount(long long l1DCM, long long l2DCM);
 
 void papi_ResetCount(int &EventSet);
 

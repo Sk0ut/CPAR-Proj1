@@ -44,11 +44,12 @@ void mult(int size, double *pha, double *phb, double *phc) {
 }
 
 
-void OnMult(int size) 
+double OnMult(int size) 
 {	
 	SYSTEMTIME Time1, Time2;
 
 	double *pha, *phb, *phc;
+	double processingTime;
 	
 	initMatrices(size, &pha, &phb, &phc);
 	
@@ -58,9 +59,13 @@ void OnMult(int size)
 
 	Time2 = clock();
 	
-	printProcessingTime((double)(Time2 - Time1) / CLOCKS_PER_SEC);	
+	processingTime = (double)(Time2 - Time1) / CLOCKS_PER_SEC;
+	printProcessingTime(processingTime);	
+	
 	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);
+
+	return processingTime;
 }
 
 void multLine(int size, double *pha, double *phb, double *phc) {
@@ -81,13 +86,14 @@ void multLine(int size, double *pha, double *phb, double *phc) {
 
 }
 
-void OnMultLine(int size)
+double OnMultLine(int size)
 {
     	SYSTEMTIME Time1, Time2;
 
 
 	double *pha, *phb, *phc;
-	
+	double processingTime;	
+
     	initMatrices(size, &pha, &phb, &phc);
 	
     	Time1 = clock();
@@ -96,13 +102,16 @@ void OnMultLine(int size)
 	
     	Time2 = clock();
 
-	printProcessingTime((double)(Time2 - Time1) / CLOCKS_PER_SEC);	
+	processingTime = (double)(Time2 - Time1) / CLOCKS_PER_SEC;
+	printProcessingTime(processingTime);	
 	
 	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);
+
+	return processingTime;
 }
 
-void OnMultParallel(int size, int nThreads) 
+double OnMultParallel(int size, int nThreads) 
 {	
 	double Time1, Time2;
 		
@@ -131,12 +140,16 @@ void OnMultParallel(int size, int nThreads)
 
 	Time2 = omp_get_wtime();
 	
-	printProcessingTime(Time2 - Time1);	
+	double processingTime = Time2 - Time1;
+
+	printProcessingTime(processingTime);	
 	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);
+
+	return processingTime;
 }
 
-void OnMultLineParallel(int size, int nThreads)
+double OnMultLineParallel(int size, int nThreads)
 {
     	double Time1, Time2;
 	
@@ -164,9 +177,13 @@ void OnMultLineParallel(int size, int nThreads)
 	
 	Time2 = omp_get_wtime();
 
-	printProcessingTime(Time2 - Time1);			
+	double processingTime = Time2 - Time1;
+
+	printProcessingTime(processingTime);			
 	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);	
+	
+	return processingTime;
 }
 
 float produtoInterno(float *v1, float *v2, int col)

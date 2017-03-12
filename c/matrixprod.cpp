@@ -18,6 +18,8 @@ int main (int argc, char *argv[])
 	int n_threads;
 	
 	int EventSet = PAPI_NULL;
+	long long l1DCM;
+	long long l2DCM;
   		
 	printCPUInformation();
 	papi_InitEvents(EventSet);
@@ -57,7 +59,8 @@ int main (int argc, char *argv[])
 				break;
 		}
 
-  		papi_StopCount(EventSet);
+  		papi_StopCount(EventSet, l1DCM, l2DCM);
+		papi_PrintCount(l1DCM, l2DCM);
 		papi_ResetCount(EventSet);		
 
 	}while (op != 0);
