@@ -3,14 +3,14 @@
 using namespace std;
 
 
-void printMatrixResult(int m_br, double **phc)
+void printMatrixResult(int size, double **matrix)
 {
 	int i, j; 
 	
 	cout << "Result matrix: " << endl;
 	for(i=0; i<1; i++)
-	{	for(j=0; j<min(10,m_br); j++)
-			cout << (*phc)[j] << " ";
+	{	for(j=0; j<min(10,size); j++)
+			cout << (*matrix)[j] << " ";
 	}
 	cout << endl;
 }

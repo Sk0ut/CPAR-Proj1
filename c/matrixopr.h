@@ -5,12 +5,12 @@
 
 #include "utils.h"
 
-void OnMult(int m_ar, int m_br);
+void OnMult(int size);
 
-void OnMultLine(int m_ar, int m_br);
+void OnMultLine(int size);
 
-void OnMultParallel(int m_ar, int m_br, int nThreads);
+void OnMultParallel(int size, int nThreads);
 
-void OnMultLineParallel(int m_ar, int m_br, int nThreads);
+void OnMultLineParallel(int size, int nThreads);
 
 #endif

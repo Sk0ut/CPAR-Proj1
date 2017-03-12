@@ -1,21 +1,21 @@
 #include "matrixopr.h"
 
-void initMatrices(int m_ar, int m_br, double **pha, double **phb, double **phc) 
+void initMatrices(int size, double **pha, double **phb, double **phc) 
 {
 	int i, j;
 
-	*pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
-	*phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
-	*phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	*pha = (double *)malloc((size * size) * sizeof(double));
+	*phb = (double *)malloc((size * size) * sizeof(double));
+	*phc = (double *)malloc((size * size) * sizeof(double));
 
-	for(i=0; i<m_ar; i++)
-		for(j=0; j<m_ar; j++)
-			(*pha)[i*m_ar + j] = (double)1.0;
+	for(i=0; i<size; i++)
+		for(j=0; j<size; j++)
+			(*pha)[i*size + j] = (double)1.0;
 
 
-	for(i=0; i<m_br; i++)
-		for(j=0; j<m_br; j++)
-			(*phb)[i*m_br + j] = (double)(i+1);
+	for(i=0; i<size; i++)
+		for(j=0; j<size; j++)
+			(*phb)[i*size + j] = (double)(i+1);
 }
 
 void freeMatrices(double **pha, double **phb, double **phc)
@@ -25,77 +25,84 @@ void freeMatrices(double **pha, double **phb, double **phc)
 	free(*phc);
 }
 
-
-void OnMult(int m_ar, int m_br) 
-{	
-	SYSTEMTIME Time1, Time2;
-		
+void mult(int size, double *pha, double *phb, double *phc) {
 	double temp;
 	int i, j, k;
+	
+	for(i=0; i<size; i++)
+	{	
+		for( j=0; j<size; j++)
+		{	
+			temp = 0;
+			for( k=0; k<size; k++)
+			{	
+				temp += pha[i*size+k] * phb[k*size+j];
+			}
+			phc[i*size+j]=temp;
+		}
+	}
+}
+
+
+void OnMult(int size) 
+{	
+	SYSTEMTIME Time1, Time2;
 
 	double *pha, *phb, *phc;
 	
-	initMatrices(m_ar, m_br, &pha, &phb, &phc);
+	initMatrices(size, &pha, &phb, &phc);
 	
     	Time1 = clock();
 
-	for(i=0; i<m_ar; i++)
-	{	
-		for( j=0; j<m_br; j++)
-		{	
-			temp = 0;
-			for( k=0; k<m_ar; k++)
-			{	
-				temp += pha[i*m_ar+k] * phb[k*m_br+j];
-			}
-			phc[i*m_ar+j]=temp;
-		}
-	}
+	mult(size, pha, phb, phc);
 
 	Time2 = clock();
 	
 	printProcessingTime((double)(Time2 - Time1) / CLOCKS_PER_SEC);	
-	printMatrixResult(m_br, &phc);
+	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);
 }
 
+void multLine(int size, double *pha, double *phb, double *phc) {
 
-void OnMultLine(int m_ar, int m_br)
-{
-    	SYSTEMTIME Time1, Time2;
-	
-	int i, j, k;
+	int i, j, k;	
+	memset(phc, 0, (size * size) * sizeof(double));
 
-	double *pha, *phb, *phc;
-	
-    	initMatrices(m_ar, m_br, &pha, &phb, &phc);
-	
-    	Time1 = clock();
-
-	for(i=0; i < m_ar; ++i)
-		for(j = 0; j < m_br; ++j)
-			phc[i*m_ar+j] = 0;
-
-	for(i=0; i<m_ar; i++)
+	for(i=0; i<size; i++)
 	{	
-		for( j=0; j<m_ar; j++) 
+		for( j=0; j<size; j++) 
 		{
-			for( k=0; k<m_br; k++)
+			for( k=0; k<size; k++)
 			{	
-				phc[i*m_ar+k] += pha[i*m_ar+j] * phb[j*m_br+k];
+				phc[i*size+k] += pha[i*size+j] * phb[j*size+k];
 			}
 		}
 	}
+
+}
+
+void OnMultLine(int size)
+{
+    	SYSTEMTIME Time1, Time2;
+
+
+	double *pha, *phb, *phc;
+	
+    	initMatrices(size, &pha, &phb, &phc);
+	
+    	Time1 = clock();
+
+	multLine(size, pha, phb, phc);
 	
     	Time2 = clock();
 
 	printProcessingTime((double)(Time2 - Time1) / CLOCKS_PER_SEC);	
 	
-	printMatrixResult(m_br, &phc);
+	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);
 }
 
-void OnMultParallel(int m_ar, int m_br, int nThreads) 
+void OnMultParallel(int size, int nThreads) 
 {	
 	double Time1, Time2;
 		
@@ -104,32 +111,32 @@ void OnMultParallel(int m_ar, int m_br, int nThreads)
 
 	double *pha, *phb, *phc;
 	
-	initMatrices(m_ar, m_br, &pha, &phb, &phc);
-	
+	initMatrices(size, &pha, &phb, &phc);
+
     	Time1 = omp_get_wtime();
 
-	for(i=0; i<m_ar; i++)
+	for(i=0; i<size; i++)
 	{			
-		for( j=0; j<m_br; j++)
+		for( j=0; j<size; j++)
 		{	
 			temp = 0;
 			#pragma omp parallel for num_threads(nThreads) reduction(+:temp)
-			for( k=0; k<m_ar; k++)
+			for( k=0; k<size; k++)
 			{	
-				temp += pha[i*m_ar+k] * phb[k*m_br+j];
+				temp += pha[i*size+k] * phb[k*size+j];
 			}
-			phc[i*m_ar+j]=temp;
+			phc[i*size+j]=temp;
 		}
 	}
 
 	Time2 = omp_get_wtime();
 	
 	printProcessingTime(Time2 - Time1);	
-	printMatrixResult(m_br, &phc);
+	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);
 }
 
-void OnMultLineParallel(int m_ar, int m_br, int nThreads)
+void OnMultLineParallel(int size, int nThreads)
 {
     	double Time1, Time2;
 	
@@ -137,22 +144,20 @@ void OnMultLineParallel(int m_ar, int m_br, int nThreads)
 
 	double *pha, *phb, *phc;
 			
-    	initMatrices(m_ar, m_br, &pha, &phb, &phc);
+    	initMatrices(size, &pha, &phb, &phc);
 	
-	//omp_set_num_threads(nThreads);
-
 	Time1 = omp_get_wtime();
+	
+	memset(phc, 0, (size * size) * sizeof(double));	
 
-	memset(phc, 0, (m_ar * m_ar) * sizeof(double));
-
-	#pragma omp parallel for num_threads(nThreads)
-	for(i=0; i<m_ar; i++)
+	#pragma omp parallel for shared(pha, phb, phc) private(j, k) num_threads(nThreads)
+	for(i=0; i<size; i++)
 	{	
-		for( j=0; j<m_ar; j++) 
+		for( j=0; j<size; j++) 
 		{
-			for( k=0; k<m_br; k++)
+			for( k=0; k<size; k++)
 			{	
-				phc[i*m_ar+k] += pha[i*m_ar+j] * phb[j*m_br+k];
+				phc[i*size+k] += pha[i*size+j] * phb[j*size+k];
 			}
 		}
 	}
@@ -160,7 +165,7 @@ void OnMultLineParallel(int m_ar, int m_br, int nThreads)
 	Time2 = omp_get_wtime();
 
 	printProcessingTime(Time2 - Time1);			
-	printMatrixResult(m_br, &phc);
+	printMatrixResult(size, &phc);
 	freeMatrices(&pha, &phb, &phc);	
 }
 

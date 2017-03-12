@@ -13,8 +13,9 @@ using namespace std;
 int main (int argc, char *argv[])
 {
 
-	int lin, col;
+	int size;
 	int op;
+	int n_threads;
 	
 	int EventSet = PAPI_NULL;
   		
@@ -27,28 +28,32 @@ int main (int argc, char *argv[])
 		cout << "2. Line Multiplication" << endl;
 		cout << "3. Parallel Multiplication" << endl;
 		cout << "4. Parallel Line Multiplication" << endl;
-		cout << "Selection?: ";
+		cout << "Selection? ";
 		cin >>op;
 		if (op == 0)
 			break;
-		printf("Dimensions: lins cols ? ");
-   		cin >> lin >> col;
+		printf("Size? ");
+   		cin >> size;
 
 		// Start counting
 		papi_StartCount(EventSet);
 
 		switch (op){
 			case 1: 
-				OnMult(lin, col);
+				OnMult(size);
 				break;
 			case 2:
-				OnMultLine(lin, col);    
+				OnMultLine(size);    
 				break;
 			case 3:
-				OnMultParallel(lin, col, omp_get_max_threads());    
+				cout << "Num threads? ";
+				cin >> n_threads;
+				OnMultParallel(size, n_threads);    
 				break;
 			case 4:
-				OnMultLineParallel(lin, col, omp_get_max_threads());     //mudar
+				cout << "Num threads? ";
+				cin >> n_threads;
+				OnMultLineParallel(size, n_threads); 
 				break;
 		}
 

@@ -13,7 +13,7 @@
 #define KYEL  "\x1B[33m"
 #define RESET "\x1B[0m"
 
-void printMatrixResult(int m_br, double **phc);
+void printMatrixResult(int size, double **matrix);
 
 void printProcessingTime(double timeMs);
 
