@@ -1,0 +1,17 @@
+sep=|
+Algo|Size|Time (s)
+Mult|600|0.628
+Mult|1000|4.353
+Mult|1400|11.103
+Mult|1800|35.738
+Mult|2200|76.349
+Mult|2600|133.157
+Mult|3000|215.983
+MultLine|600|0.553
+MultLine|1000|2.563
+MultLine|1400|6.341
+MultLine|1800|14.733
+MultLine|2200|26.739
+MultLine|2600|44.221
+MultLine|3000|67.593
+
