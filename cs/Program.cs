@@ -91,18 +91,6 @@ namespace CPAR
             Console.WriteLine();
         }
 
-
-        float produtoInterno(float[] v1, float[] v2, int col)
-        {
-            int i;
-            float soma = (float)0.0;
-
-            for (i = 0; i < col; i++)
-                soma += v1[i] * v2[i];
-
-            return (soma);
-        }
-
         static void Main(string[] args)
         {
             int lin, col;
