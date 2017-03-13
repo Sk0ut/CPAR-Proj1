@@ -1,17 +1,17 @@
 sep=|
 Algo|Size|Time (s)
-Mult|600|0.628
-Mult|1000|4.353
-Mult|1400|11.103
-Mult|1800|35.738
-Mult|2200|76.349
-Mult|2600|133.157
-Mult|3000|215.983
-MultLine|600|0.553
-MultLine|1000|2.563
-MultLine|1400|6.341
-MultLine|1800|14.733
-MultLine|2200|26.739
-MultLine|2600|44.221
-MultLine|3000|67.593
+Mult|600|0,504
+Mult|1000|3,189
+Mult|1400|8,721
+Mult|1800|18,132
+Mult|2200|33,094
+Mult|2600|55,788
+Mult|3000|86,246
+MultLine|600|0,442
+MultLine|1000|2,084
+MultLine|1400|5,816
+MultLine|1800|12,331
+MultLine|2200|22,821
+MultLine|2600|37,675
+MultLine|3000|58,008
 
