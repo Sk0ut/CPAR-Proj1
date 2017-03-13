@@ -124,12 +124,13 @@ double OnMultParallel(int size, int nThreads)
 
     	Time1 = omp_get_wtime();
 
+
+	#pragma omp parallel for private(i,j,k) num_threads(nThreads) reduction(+:temp)
 	for(i=0; i<size; i++)
 	{			
 		for( j=0; j<size; j++)
 		{	
 			temp = 0;
-			#pragma omp parallel for num_threads(nThreads) reduction(+:temp)
 			for( k=0; k<size; k++)
 			{	
 				temp += pha[i*size+k] * phb[k*size+j];
@@ -163,7 +164,7 @@ double OnMultLineParallel(int size, int nThreads)
 	
 	memset(phc, 0, (size * size) * sizeof(double));	
 
-	#pragma omp parallel for shared(pha, phb, phc) private(j, k) num_threads(nThreads)
+	#pragma omp parallel for private(i, j, k) num_threads(nThreads)
 	for(i=0; i<size; i++)
 	{	
 		for( j=0; j<size; j++) 
