@@ -125,7 +125,7 @@ double OnMultParallel(int size, int nThreads)
     	Time1 = omp_get_wtime();
 
 
-	#pragma omp parallel for private(i,j,k) num_threads(nThreads) reduction(+:temp)
+	#pragma omp parallel for private(i,j,k,temp) num_threads(nThreads)
 	for(i=0; i<size; i++)
 	{			
 		for( j=0; j<size; j++)
